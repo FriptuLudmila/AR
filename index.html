@@ -36,8 +36,8 @@
     const sceneEl = document.querySelector('a-scene');
     const firstNft = document.querySelector('#first-marker');
     const secondNft = document.querySelector('#second-marker');
-    const statusText = document.querySelector('#status-text');
-    const interactionText = document.querySelector('#interaction-text');
+    const statusText = document.getElementById('status-text-html');
+    const interactionText = document.getElementById('interaction-text-html');
 
     // Initially hide the second marker
     secondNft.setAttribute('visible', 'false');
@@ -51,9 +51,9 @@
         secondMarkerUnlocked = true;
         totalInteractions++;
 
-        statusText.setAttribute('text', 'value', 'Scenario 1 Complete! Find booksign.');
+        statusText.textContent = 'Scenario 1 Complete! Find booksign.';
         setTimeout(() => {
-          interactionText.setAttribute('text', 'value', 'Tap the 3D model to interact!');
+          interactionText.textContent = 'Tap the 3D model to interact!';
         }, 2000);
 
         // Enable the second marker
@@ -71,12 +71,12 @@
 
       if (clickCount === 1) {
         // First tap: Change color
-        interactionText.setAttribute('text', 'value', 'Color changed! Tap again!');
+        interactionText.textContent = 'Color changed! Tap again!';
         firstModel.setAttribute('material', 'color', '#FF6B6B');
         sceneModelColor = 'red';
       } else if (clickCount === 2) {
         // Second tap: Rotate animation
-        interactionText.setAttribute('text', 'value', 'Rotating! Tap again!');
+        interactionText.textContent = 'Rotating! Tap again!';
         firstModel.setAttribute('animation', {
           property: 'rotation',
           to: '0 360 0',
@@ -88,7 +88,7 @@
         sceneModelColor = 'cyan';
       } else if (clickCount === 3) {
         // Third tap: Scale animation
-        interactionText.setAttribute('text', 'value', 'Growing! Tap to reset!');
+        interactionText.textContent = 'Growing! Tap to reset!';
         firstModel.setAttribute('animation', {
           property: 'scale',
           from: '100 100 100',
@@ -101,7 +101,7 @@
         sceneModelColor = 'yellow';
       } else {
         // Fourth tap: Reset
-        interactionText.setAttribute('text', 'value', 'Reset! Start tapping again!');
+        interactionText.textContent = 'Reset! Start tapping again!';
         firstModel.setAttribute('animation', {
           property: 'scale',
           to: '100 100 100',
@@ -123,11 +123,11 @@
       console.log('Second marker (booksign) found!');
 
       if (secondMarkerUnlocked) {
-        statusText.setAttribute('text', 'value', 'Scenario 2 Complete! Tap griffin!');
-        interactionText.setAttribute('text', 'value', 'Click the Griffin for animation!');
+        statusText.textContent = 'Scenario 2 Complete! Tap griffin!';
+        interactionText.textContent = 'Click the Griffin for animation!';
         totalInteractions++;
       } else {
-        interactionText.setAttribute('text', 'value', 'Scan first marker first!');
+        interactionText.textContent = 'Scan first marker first!';
       }
     });
 
@@ -140,7 +140,7 @@
         griffinAnimating = true;
         totalInteractions++;
         console.log('Griffin tapped! Total interactions:', totalInteractions);
-        interactionText.setAttribute('text', 'value', 'Griffin is flying!');
+        interactionText.textContent = 'Griffin is flying!';
 
         // Flying animation
         griffinModel.setAttribute('animation__fly', {
@@ -164,7 +164,7 @@
 
         setTimeout(() => {
           griffinAnimating = false;
-          interactionText.setAttribute('text', 'value', 'Tap again for more!');
+          interactionText.textContent = 'Tap again for more!';
         }, 4000);
       }
     };
@@ -178,7 +178,7 @@
       const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181'];
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
       debugBox.setAttribute('color', randomColor);
-      interactionText.setAttribute('text', 'value', 'Box color changed! Total: ' + totalInteractions);
+      interactionText.textContent = 'Box color changed! Total: ' + totalInteractions;
     };
 
     debugBox.addEventListener('tap', handleBoxInteraction);
@@ -188,14 +188,14 @@
     firstNft.addEventListener('markerFound', function() {
       proximityTimer = setInterval(() => {
         if (firstMarkerScanned) {
-          interactionText.setAttribute('text', 'value', 'You are near marker 1!');
+          interactionText.textContent = 'You are near marker 1!';
         }
       }, 3000);
     });
 
     firstNft.addEventListener('markerLost', function() {
       clearInterval(proximityTimer);
-      interactionText.setAttribute('text', 'value', 'Marker 1 lost!');
+      interactionText.textContent = 'Marker 1 lost!';
     });
 
     // ======= SCENARIO 5: Multi-Touch Gesture (Double Tap) =======
@@ -212,22 +212,22 @@
       console.log('Time since last tap:', timeDiff + 'ms');
 
       // Show tap detected on screen
-      statusText.setAttribute('text', 'value', 'Tap detected! #' + tapCounter);
+      statusText.textContent = 'Tap detected! #' + tapCounter;
 
       // Double tap detection
       if (timeDiff < 500 && timeDiff > 50) {
         totalInteractions++;
         console.log('*** DOUBLE TAP! ***');
 
-        // Update display
-        statusText.setAttribute('text', 'value', 'DOUBLE TAP! Total: ' + totalInteractions);
-        interactionText.setAttribute('text', 'value', '*** DOUBLE TAP! ***');
-        interactionText.setAttribute('text', 'color', '#FF00FF');
+        // Update display with animation
+        statusText.textContent = 'DOUBLE TAP! Total: ' + totalInteractions;
+        interactionText.textContent = '*** DOUBLE TAP! ***';
+        interactionText.classList.add('double-tap');
 
         // Visual feedback
         setTimeout(() => {
-          interactionText.setAttribute('text', 'value', 'Try again!');
-          interactionText.setAttribute('text', 'color', '#00FF00');
+          interactionText.textContent = 'Try again!';
+          interactionText.classList.remove('double-tap');
         }, 1000);
 
         lastTapTime = 0;
@@ -237,8 +237,8 @@
     }, true);
 
     // Initial status message
-    statusText.setAttribute('text', 'value', 'Scan the first marker (milky)');
-    interactionText.setAttribute('text', 'value', 'Interactive AR Experience Ready!');
+    statusText.textContent = 'Scan the first marker (milky)';
+    interactionText.textContent = 'Interactive AR Experience Ready!';
 
     // ======= SCENARIO 6: Continuous Stats Display =======
     setInterval(() => {
@@ -271,9 +271,60 @@
     font-size: 1.25em;
     color: white;
   }
+
+  /* Interactive AR UI Overlay */
+  #ar-ui {
+    position: fixed;
+    top: 10px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    pointer-events: none;
+    text-align: center;
+    font-family: Arial, sans-serif;
+  }
+
+  #status-text-html {
+    background: rgba(255, 255, 0, 0.8);
+    color: black;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  #interaction-text-html {
+    background: rgba(0, 255, 0, 0.8);
+    color: black;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    display: inline-block;
+  }
+
+  #interaction-text-html.double-tap {
+    background: rgba(255, 0, 255, 0.9);
+    color: white;
+    font-size: 22px;
+    animation: pulse 0.5s;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
 </style>
 
 <body style="margin : 0px; overflow: hidden;">
+  <!-- AR UI Overlay -->
+  <div id="ar-ui">
+    <div id="status-text-html">Tap anywhere to test!</div>
+    <br>
+    <div id="interaction-text-html">Double tap for interaction</div>
+  </div>
+
   <!-- minimal loader shown until image descriptors are loaded. Loading may take a while according to the device computational power -->
   <div class="arjs-loader">
     <div>Loading, please wait...</div>
@@ -346,24 +397,28 @@
     </a-nft>
 
     <!-- Status text displayed on screen -->
-    <a-text
-      id="status-text"
-      value="Initializing..."
-      color="yellow"
-      position="0 2.5 -3"
-      align="center"
-      width="6"
-    ></a-text>
+    <a-entity position="0 0 -2">
+      <a-text
+        id="status-text"
+        value="Tap anywhere to test!"
+        color="yellow"
+        position="0 0.3 0"
+        align="center"
+        width="3"
+        wrap-count="40"
+      ></a-text>
 
-    <!-- Interaction feedback text -->
-    <a-text
-      id="interaction-text"
-      value="Ready for interactions!"
-      color="#00FF00"
-      position="0 1.5 -3"
-      align="center"
-      width="5"
-    ></a-text>
+      <!-- Interaction feedback text -->
+      <a-text
+        id="interaction-text"
+        value="Double tap for interaction"
+        color="#00FF00"
+        position="0 -0.3 0"
+        align="center"
+        width="3"
+        wrap-count="40"
+      ></a-text>
+    </a-entity>
     <!-- static camera that moves according to the device movemenents -->
     <a-entity camera></a-entity>
   </a-scene>
