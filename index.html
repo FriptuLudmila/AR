@@ -42,10 +42,18 @@
       console.log('Second marker (booksign) found!');
 
       if (secondMarkerUnlocked) {
-        alert('Second object scanned! Both complete!');
+        alert('Second object scanned! Griffin should be visible now!');
         statusText.setAttribute('text', 'value', 'Both objects scanned!');
+
+        // Debug: Check if griffin model exists and is loaded
+        const griffinModel = document.querySelector('#griffin-model');
+        console.log('Griffin model element:', griffinModel);
+        console.log('Griffin visible:', griffinModel.getAttribute('visible'));
+        console.log('Griffin position:', griffinModel.getAttribute('position'));
+        console.log('Griffin scale:', griffinModel.getAttribute('scale'));
       } else {
         console.log('Second marker detected but not unlocked yet');
+        alert('Please scan the first marker (milky) first!');
       }
     });
 
@@ -128,11 +136,20 @@
       <a-entity
         id="griffin-model"
         gltf-model="griffin.gltf"
-        scale="200 200 200"
-        position="0 100 0"
-        rotation="-90 0 0"
+        scale="50 50 50"
+        position="0 0 0"
+        rotation="0 0 0"
       >
       </a-entity>
+      <!-- Debug red box to verify marker tracking -->
+      <a-box
+        color="red"
+        width="50"
+        height="50"
+        depth="50"
+        position="0 25 0"
+        opacity="0.5"
+      ></a-box>
     </a-nft>
 
     <!-- Status text displayed on screen -->
