@@ -118,9 +118,6 @@
     // Listen for tap event
     firstModel.addEventListener('tap', handleFirstModelInteraction);
 
-    // Also support direct touch on the marker area
-    firstNft.addEventListener('touchend', handleFirstModelInteraction);
-
     // ======= SCENARIO 3: Griffin Model Interactions =======
     secondNft.addEventListener('markerFound', function() {
       console.log('Second marker (booksign) found!');
@@ -173,7 +170,6 @@
     };
 
     griffinModel.addEventListener('tap', handleGriffinInteraction);
-    secondNft.addEventListener('touchend', handleGriffinInteraction);
 
     // Touch interaction on debug box
     const handleBoxInteraction = function() {
@@ -203,40 +199,40 @@
     });
 
     // ======= SCENARIO 5: Multi-Touch Gesture (Double Tap) =======
-    let lastTap = 0;
-    let tapCount = 0;
+    let lastTapTime = 0;
 
-    document.body.addEventListener('touchend', function(e) {
-      const currentTime = new Date().getTime();
-      const tapLength = currentTime - lastTap;
+    window.addEventListener('touchstart', function(e) {
+      const currentTime = Date.now();
+      const timeDiff = currentTime - lastTapTime;
 
-      if (tapLength < 500 && tapLength > 0) {
-        // Double tap detected
-        tapCount++;
-        if (tapCount >= 2) {
-          totalInteractions++;
-          console.log('Double tap detected! Total:', totalInteractions);
-          statusText.setAttribute('text', 'value', 'Double tap! Total: ' + totalInteractions);
+      console.log('Touch detected! Time since last tap:', timeDiff + 'ms');
 
-          // Create a visual effect
-          interactionText.setAttribute('text', {
-            value: 'DOUBLE TAP!',
-            color: '#FF00FF'
-          });
-          setTimeout(() => {
-            interactionText.setAttribute('text', {
-              value: 'Keep interacting!',
-              color: '#00FF00'
-            });
-          }, 500);
+      // Double tap detected if less than 400ms between taps
+      if (timeDiff < 400 && timeDiff > 0) {
+        totalInteractions++;
+        console.log('=== DOUBLE TAP DETECTED! Total interactions:', totalInteractions);
 
-          tapCount = 0;
-        }
+        // Prevent default behavior
+        e.preventDefault();
+
+        // Update both text displays
+        statusText.setAttribute('text', 'value', 'DOUBLE TAP! Count: ' + totalInteractions);
+        interactionText.setAttribute('text', 'value', '*** DOUBLE TAP! ***');
+        interactionText.setAttribute('text', 'color', '#FF00FF');
+
+        // Reset after showing message
+        setTimeout(() => {
+          interactionText.setAttribute('text', 'value', 'Double tap anywhere!');
+          interactionText.setAttribute('text', 'color', '#00FF00');
+        }, 800);
+
+        // Reset timer to prevent triple-tap
+        lastTapTime = 0;
       } else {
-        tapCount = 1;
+        // First tap or timeout expired
+        lastTapTime = currentTime;
       }
-      lastTap = currentTime;
-    });
+    }, false);
 
     // Initial status message
     statusText.setAttribute('text', 'value', 'Scan the first marker (milky)');
