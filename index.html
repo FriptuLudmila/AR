@@ -2,6 +2,28 @@
 <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
 <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
+<script>
+  // Debug NFT tracking
+  window.addEventListener('load', function() {
+    const sceneEl = document.querySelector('a-scene');
+    const nftEl = document.querySelector('a-nft');
+
+    sceneEl.addEventListener('arjs-nft-loaded', function() {
+      console.log('NFT marker loaded successfully');
+      alert('NFT marker loaded!');
+    });
+
+    nftEl.addEventListener('markerFound', function() {
+      console.log('NFT marker found!');
+      alert('Marker found!');
+    });
+
+    nftEl.addEventListener('markerLost', function() {
+      console.log('NFT marker lost');
+    });
+  });
+</script>
+
 <!-- style for the loader -->
 <style>
   .arjs-loader {
@@ -35,14 +57,14 @@
     vr-mode-ui="enabled: false;"
     renderer="logarithmicDepthBuffer: true;"
     embedded
-    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960;"
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; sourceWidth: 640; sourceHeight: 480; displayWidth: 640; displayHeight: 480;"
   >
     <!-- a-nft is the anchor that defines an Image Tracking entity -->
     <!-- on 'url' use the path to the Image Descriptors created before. -->
     <!-- the path should end with the name without the extension e.g. if file is 'pinball.fset' the path should end with 'pinball' -->
     <a-nft
       type="nft"
-      url="milky"
+      url="./milky"
       smooth="true"
       smoothCount="10"
       smoothTolerance=".01"
