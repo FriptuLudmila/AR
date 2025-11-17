@@ -200,39 +200,41 @@
 
     // ======= SCENARIO 5: Multi-Touch Gesture (Double Tap) =======
     let lastTapTime = 0;
+    let tapCounter = 0;
 
-    window.addEventListener('touchstart', function(e) {
+    // Simple tap counter for testing
+    document.addEventListener('touchstart', function(e) {
+      tapCounter++;
       const currentTime = Date.now();
       const timeDiff = currentTime - lastTapTime;
 
-      console.log('Touch detected! Time since last tap:', timeDiff + 'ms');
+      console.log('=== TAP #' + tapCounter + ' ===');
+      console.log('Time since last tap:', timeDiff + 'ms');
 
-      // Double tap detected if less than 400ms between taps
-      if (timeDiff < 400 && timeDiff > 0) {
+      // Show tap detected on screen
+      statusText.setAttribute('text', 'value', 'Tap detected! #' + tapCounter);
+
+      // Double tap detection
+      if (timeDiff < 500 && timeDiff > 50) {
         totalInteractions++;
-        console.log('=== DOUBLE TAP DETECTED! Total interactions:', totalInteractions);
+        console.log('*** DOUBLE TAP! ***');
 
-        // Prevent default behavior
-        e.preventDefault();
-
-        // Update both text displays
-        statusText.setAttribute('text', 'value', 'DOUBLE TAP! Count: ' + totalInteractions);
+        // Update display
+        statusText.setAttribute('text', 'value', 'DOUBLE TAP! Total: ' + totalInteractions);
         interactionText.setAttribute('text', 'value', '*** DOUBLE TAP! ***');
         interactionText.setAttribute('text', 'color', '#FF00FF');
 
-        // Reset after showing message
+        // Visual feedback
         setTimeout(() => {
-          interactionText.setAttribute('text', 'value', 'Double tap anywhere!');
+          interactionText.setAttribute('text', 'value', 'Try again!');
           interactionText.setAttribute('text', 'color', '#00FF00');
-        }, 800);
+        }, 1000);
 
-        // Reset timer to prevent triple-tap
         lastTapTime = 0;
       } else {
-        // First tap or timeout expired
         lastTapTime = currentTime;
       }
-    }, false);
+    }, true);
 
     // Initial status message
     statusText.setAttribute('text', 'value', 'Scan the first marker (milky)');
