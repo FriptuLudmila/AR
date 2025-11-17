@@ -13,19 +13,21 @@
   let sceneModelColor = 'original';
   let totalInteractions = 0;
 
-  // Register custom A-Frame components for interactions
-  AFRAME.registerComponent('clickable', {
+  // Register custom A-Frame components for touch interactions
+  AFRAME.registerComponent('tap-listener', {
     init: function() {
-      this.el.addEventListener('click', () => {
-        this.el.emit('object-clicked');
-      });
-    }
-  });
+      let touchStartTime = 0;
 
-  AFRAME.registerComponent('hoverable', {
-    init: function() {
-      this.el.addEventListener('mouseenter', () => {
-        this.el.emit('object-hovered');
+      this.el.addEventListener('touchstart', (e) => {
+        touchStartTime = Date.now();
+      });
+
+      this.el.addEventListener('touchend', (e) => {
+        const touchDuration = Date.now() - touchStartTime;
+        if (touchDuration < 200) { // Quick tap
+          this.el.emit('tap');
+          console.log('Tap detected on', this.el.id);
+        }
       });
     }
   });
@@ -59,20 +61,22 @@
       }
     });
 
-    // ======= SCENARIO 2: Click/Tap Interaction on First Model =======
+    // ======= SCENARIO 2: Touch Interaction on First Model =======
     const firstModel = document.querySelector('#first-model');
-    firstModel.addEventListener('click', function() {
+
+    const handleFirstModelInteraction = function() {
       clickCount++;
       totalInteractions++;
+      console.log('First model interaction! Count:', clickCount);
 
       if (clickCount === 1) {
-        // First click: Change color
-        interactionText.setAttribute('text', 'value', 'Color changed! Click again!');
+        // First tap: Change color
+        interactionText.setAttribute('text', 'value', 'Color changed! Tap again!');
         firstModel.setAttribute('material', 'color', '#FF6B6B');
         sceneModelColor = 'red';
       } else if (clickCount === 2) {
-        // Second click: Rotate animation
-        interactionText.setAttribute('text', 'value', 'Rotating! Click again!');
+        // Second tap: Rotate animation
+        interactionText.setAttribute('text', 'value', 'Rotating! Tap again!');
         firstModel.setAttribute('animation', {
           property: 'rotation',
           to: '0 360 0',
@@ -83,8 +87,8 @@
         firstModel.setAttribute('material', 'color', '#4ECDC4');
         sceneModelColor = 'cyan';
       } else if (clickCount === 3) {
-        // Third click: Scale animation
-        interactionText.setAttribute('text', 'value', 'Growing! Click to reset!');
+        // Third tap: Scale animation
+        interactionText.setAttribute('text', 'value', 'Growing! Tap to reset!');
         firstModel.setAttribute('animation', {
           property: 'scale',
           from: '100 100 100',
@@ -96,8 +100,8 @@
         firstModel.setAttribute('material', 'color', '#FFE66D');
         sceneModelColor = 'yellow';
       } else {
-        // Fourth click: Reset
-        interactionText.setAttribute('text', 'value', 'Reset! Start clicking again!');
+        // Fourth tap: Reset
+        interactionText.setAttribute('text', 'value', 'Reset! Start tapping again!');
         firstModel.setAttribute('animation', {
           property: 'scale',
           to: '100 100 100',
@@ -109,7 +113,13 @@
         clickCount = 0;
         sceneModelColor = 'original';
       }
-    });
+    };
+
+    // Listen for tap event
+    firstModel.addEventListener('tap', handleFirstModelInteraction);
+
+    // Also support direct touch on the marker area
+    firstNft.addEventListener('touchend', handleFirstModelInteraction);
 
     // ======= SCENARIO 3: Griffin Model Interactions =======
     secondNft.addEventListener('markerFound', function() {
@@ -127,11 +137,12 @@
     const griffinModel = document.querySelector('#griffin-model');
     const debugBox = document.querySelector('#debug-box');
 
-    // Click interaction on Griffin
-    griffinModel.addEventListener('click', function() {
+    // Touch interaction on Griffin
+    const handleGriffinInteraction = function() {
       if (!griffinAnimating) {
         griffinAnimating = true;
         totalInteractions++;
+        console.log('Griffin tapped! Total interactions:', totalInteractions);
         interactionText.setAttribute('text', 'value', 'Griffin is flying!');
 
         // Flying animation
@@ -156,19 +167,25 @@
 
         setTimeout(() => {
           griffinAnimating = false;
-          interactionText.setAttribute('text', 'value', 'Click again for more!');
+          interactionText.setAttribute('text', 'value', 'Tap again for more!');
         }, 4000);
       }
-    });
+    };
 
-    // Click interaction on debug box
-    debugBox.addEventListener('click', function() {
+    griffinModel.addEventListener('tap', handleGriffinInteraction);
+    secondNft.addEventListener('touchend', handleGriffinInteraction);
+
+    // Touch interaction on debug box
+    const handleBoxInteraction = function() {
       totalInteractions++;
+      console.log('Box tapped! Total:', totalInteractions);
       const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181'];
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
       debugBox.setAttribute('color', randomColor);
       interactionText.setAttribute('text', 'value', 'Box color changed! Total: ' + totalInteractions);
-    });
+    };
+
+    debugBox.addEventListener('tap', handleBoxInteraction);
 
     // ======= SCENARIO 4: Proximity Detection =======
     let proximityTimer = 0;
@@ -187,20 +204,36 @@
 
     // ======= SCENARIO 5: Multi-Touch Gesture (Double Tap) =======
     let lastTap = 0;
-    sceneEl.addEventListener('click', function(e) {
+    let tapCount = 0;
+
+    document.body.addEventListener('touchend', function(e) {
       const currentTime = new Date().getTime();
       const tapLength = currentTime - lastTap;
 
-      if (tapLength < 300 && tapLength > 0) {
+      if (tapLength < 500 && tapLength > 0) {
         // Double tap detected
-        totalInteractions++;
-        statusText.setAttribute('text', 'value', 'Double tap! Interactions: ' + totalInteractions);
+        tapCount++;
+        if (tapCount >= 2) {
+          totalInteractions++;
+          console.log('Double tap detected! Total:', totalInteractions);
+          statusText.setAttribute('text', 'value', 'Double tap! Total: ' + totalInteractions);
 
-        // Create a visual effect
-        interactionText.setAttribute('material', 'color', '#FF00FF');
-        setTimeout(() => {
-          interactionText.setAttribute('material', 'color', '#00FF00');
-        }, 200);
+          // Create a visual effect
+          interactionText.setAttribute('text', {
+            value: 'DOUBLE TAP!',
+            color: '#FF00FF'
+          });
+          setTimeout(() => {
+            interactionText.setAttribute('text', {
+              value: 'Keep interacting!',
+              color: '#00FF00'
+            });
+          }, 500);
+
+          tapCount = 0;
+        }
+      } else {
+        tapCount = 1;
       }
       lastTap = currentTime;
     });
@@ -265,15 +298,15 @@
       smoothTolerance="0.5"
       smoothThreshold="2"
     >
-      <!-- First object 3D model with clickable interaction -->
+      <!-- First object 3D model with tap interaction -->
       <a-entity
         id="first-model"
         gltf-model="scene.gltf"
         scale="100 100 100"
         position="0 0 0"
         rotation="0 0 0"
-        clickable
-        class="clickable"
+        tap-listener
+        class="interactive"
       >
       </a-entity>
     </a-nft>
@@ -289,15 +322,15 @@
       smoothThreshold="2"
       visible="false"
     >
-      <!-- Second object 3D model - Griffin with clickable interaction -->
+      <!-- Second object 3D model - Griffin with tap interaction -->
       <a-entity
         id="griffin-model"
         gltf-model="griffin.gltf"
         scale="50 50 50"
         position="0 0 0"
         rotation="0 0 0"
-        clickable
-        class="clickable"
+        tap-listener
+        class="interactive"
       >
       </a-entity>
       <!-- Debug red box to verify marker tracking and color interaction -->
@@ -309,8 +342,8 @@
         depth="50"
         position="0 25 0"
         opacity="0.5"
-        clickable
-        class="clickable"
+        tap-listener
+        class="interactive"
       ></a-box>
     </a-nft>
 
